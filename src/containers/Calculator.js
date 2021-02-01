@@ -1,73 +1,142 @@
 import React from 'react';
-import Button from '../UI/Button';
 import './Calculator.css';
 import NumPad from '../components/NumPad/NumPad';
-
+import DisplayScreen from '../components/DisplayScreen/DisplayScreen';
+import displayScreen from '../components/DisplayScreen/DisplayScreen';
 class Calculator extends React.Component {
 
     state = {
-        calculatorScreen : '',
-        waitingForOperand : false,
-        pendingOperator :  false
+        display : '0',
+        waitingForOperand : true,
+        pendingOperator :  '',
+        result : 0
     }
 
-    onNumButtonClick = () => {
+    calculate = (rightOperand, pendingOperator) => {
+
+        let newResult = this.state.result;
+
+        switch (pendingOperator) {
+            case  '+':
+                newResult = newResult + rightOperand;
+                break;
+            case '-':
+                newResult = newResult - rightOperand;
+                break;
+            case '*':
+                newResult = newResult * rightOperand;
+                break;
+            case '/':
+                if (rightOperand === 0) {
+                    return false;
+                }
+                newResult = newResult / rightOperand;
+                break;
+            default:
+                break;
+        }
+        this.setState({
+            result : newResult,
+            display : newResult.toString()
+        })
+        
+        return true;
+    }
+
+    onNumButtonClick = (numberClicked) => {
+        let newDisplay = this.state.display;
+        
+        if ((this.state.display === '0' && numberClicked === 0)) {
+            return
+        }
+
+        if (this.state.waitingForOperand) {
+            newDisplay = '';
+            this.setState({waitingForOperand : false});
+        }
+
+        if (this.state.display !== '0') {
+            newDisplay = newDisplay + numberClicked.toString();
+        }
+        else {
+            newDisplay =  numberClicked.toString();
+        }
+        this.setState({display : newDisplay});
+    }
+
+    onOperatorButtonClick = (operator) => {
+
+        const operand = parseInt(this.state.display);
+        const pendingOperator = this.state.pendingOperator;
+        this.setState({pendingOperator : operator});
+
+        if (!this.state.waitingForOperand) {
+            if (!this.calculate(operand, pendingOperator)) {
+                return;
+            }
+        }
+        else {
+            this.setState({result : operand});
+        }
+
+        this.setState({
+            pendingOperator : operator,
+            waitingForOperand : true
+        })
 
     }
 
-    onOperatorButtonClicked = () => {
+    onEqualsButtonClick = () => {
+        const operand = parseInt(this.state.display);
 
+        if(!this.state.waitingForOperand) {
+            if(!this.calculate(operand, this.state.pendingOperator)) {
+                return;
+            }
+            this.setState({pendingOperator : 'Undefined'});
+        }
+        else {
+            this.setState({display : operand.toString()});
+        }
+
+        this.setState({
+            result : operand,
+            waitingForOperand : true,
+            display : ''
+        })
     }
 
-    onEqualsButtonClicked = () => {
-
+    onClearButtonClick = () => {
+        this.setState({
+            result : 0,
+            display : '0',
+            waitingForOperand : true,
+            pendingOperator : ''
+        })
     }
 
-    onClearButtonClicked = () => {
-
+    componentDidUpdate() {
+        console.log('display = ' + this.state.display);
+        console.log('result = ' + this.state.result);
     }
-
 
     render() {
-        let temp = this.state.calculatorScreen;
-
-        if(temp[temp.length-1] === '/') {
-            temp = temp.substring(0, temp.length-1);
-            this.setState({calculatorScreen : temp});
-        }
 
         return(
             <div className = 'calculator'>
-                <input className = 'calculator-screen' type = 'text' value = {this.state.calculatorScreen} disabled></input>
-                <div className = 'main'>
-                    <NumPad 
-                        onNumButtonClick = {this.onNumButtonClick}
-                    />
-                    <Button label = '1' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '2' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '3' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '+' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-
-                    <Button label = '4' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '5' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '6' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '-' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-
-                    <Button label = '7' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '8' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '9' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '*' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-
-                    <Button label = 'C' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '0' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '=' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                    <Button label = '/' clicked = {(event)=>this.onClickHandler(event)} keyPressed = {this.keyPressedHandler}/>
-                </div>
+                <DisplayScreen 
+                    value = {this.state.display}
+                    expression = {`${this.state.result!==0 ? this.state.result : ''}${this.state.pendingOperator}${this.state.waitingForOperand  ? '' : this.state.display}`}
+                />
+                <NumPad 
+                    onNumButtonClick = {this.onNumButtonClick}
+                    onOperatorButtonClick = {this.onOperatorButtonClick}
+                    onEqualsButtonClick = {this.onEqualsButtonClick}
+                    onClearButtonClick = {this.onClearButtonClick}
+                /> 
             </div>
-            
         );
     }
-
 }
 
 export default Calculator;
