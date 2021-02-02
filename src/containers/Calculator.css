@@ -1,12 +1,12 @@
 .calculator-light-mode{
     text-align: center;
-    padding: 20%;
+    padding: 5% 30% 30%;
     background-color: #fff;
 }
 
 .calculator-dark-mode {
     text-align: center;
-    padding: 20%;
+    padding: 5% 30% 30%;
     background-color: #000;
 }
 
