@@ -3,9 +3,9 @@ import './DisplayScreen.css';
 
 const displayScreen = (props) => {
     return (
-        <div>
+        <div className={props.darkMode ? 'dark' : 'light'}>
             <input className = 'input-expression' type = 'text' value = {props.expression} disabled/>
-            <input className = 'input-result' type = 'text' value = {props.value} disabled/>
+            <input className = 'input-result' type = 'text' value = {props.value} disabled autoFocus/>
         </div>
     );
 }

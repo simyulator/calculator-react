@@ -8,8 +8,7 @@ const button = (props) => {
             type = "button" 
             value = {props.label} 
             onClick = {props.clicked} 
-            onKeyPress = {props.keyPressed} 
-            autoFocus
+            onKeyPress = {props.keyPressed}
         />
     );
 }

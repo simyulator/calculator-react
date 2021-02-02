@@ -1,4 +1,19 @@
-.calculator{
+.calculator-light-mode{
     text-align: center;
     padding: 20%;
+    background-color: #fff;
+}
+
+.calculator-dark-mode {
+    text-align: center;
+    padding: 20%;
+    background-color: #000;
+}
+
+.extra-buttons-dark input {
+    color: white;
+}
+
+.extra-buttons-white input {
+    color: black;
 }
